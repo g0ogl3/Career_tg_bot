@@ -52,6 +52,7 @@ def get_user(user_id):
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     chat_id = message.chat.id
+    users[chat_id] = {}
     bot.send_message(chat_id, "Привет! Я помогу тебе найти новое направление. Сколько тебе лет?")
     bot.register_next_step_handler(message, ask_mood)
     
@@ -61,24 +62,10 @@ def ask_mood(message):
     users[chat_id]["age"] = message.text
     age_text = message.text.strip()
 
-    if users[chat_id].get("age_verified"):
-        bot.send_message(chat_id, "Ты уже прошел анкетирование.")
-        return
-
     if not age_text.isdigit():
         bot.send_message(chat_id, "Пожалуйста, введи возраст цифрами.")
         bot.register_next_step_handler(message, ask_mood)
         return
-
-    age = int(age_text)
-    if age < 16:
-        bot.send_message(chat_id, "Ты слишком маленький, чтобы работать 😅")
-        age_verified = False
-        return
-    
-    users[chat_id]["age"] = age
-    users[chat_id]["age_verified"] = True
-
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add("🔥 Хочу вдохновения", "😫 Выгорел(а)", "👀 Просто интересно")
